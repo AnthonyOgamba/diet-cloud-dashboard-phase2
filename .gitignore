@@ -1,0 +1,35 @@
+# Python environments
+.venv/
+venv/
+env/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Azure Function local secrets
+local.settings.json
+**/local.settings.json
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# VS Code local settings
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Node dependencies, if introduced later
+node_modules/
+
+# Original team submissions kept outside final source
+member-submissions/
