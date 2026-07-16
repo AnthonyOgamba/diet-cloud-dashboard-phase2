@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nutritional Insights cloud diet analysis dashboard">
+    <title>Nutritional Insights</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to dashboard</a>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <h1>Nutritional Insights</h1>
+        </div>
+    </header>
+
+    <main id="main-content" class="dashboard">
+        <section aria-labelledby="explore-heading">
+            <h2 id="explore-heading">Explore Nutritional Insights</h2>
+
+            <div class="metadata-strip" aria-label="Dataset summary">
+                <div><span>Total records</span><strong id="total-records">—</strong></div>
+                <div><span>Avg. protein</span><strong id="average-protein">—</strong></div>
+                <div><span>Avg. carbohydrates</span><strong id="average-carbs">—</strong></div>
+                <div><span>Execution time</span><strong id="execution-time">—</strong></div>
+                <div><span>Dataset</span><strong id="dataset-name">—</strong></div>
+            </div>
+
+            <div class="chart-grid">
+                <article class="chart-card">
+                    <header class="card-heading">
+                        <h3>Bar Chart</h3>
+                        <p>Average macronutrient content by diet type.</p>
+                    </header>
+                    <div class="chart-area">
+                        <canvas id="bar-chart">Average protein by diet type bar chart.</canvas>
+                    </div>
+                </article>
+
+                <article class="chart-card">
+                    <header class="card-heading">
+                        <h3>Scatter Plot</h3>
+                        <p>Nutrient relationships (e.g., protein vs carbs).</p>
+                    </header>
+                    <div class="chart-area">
+                        <canvas id="scatter-chart">Protein and carbohydrate relationship scatter plot.</canvas>
+                    </div>
+                </article>
+
+                <article id="heatmap-card" class="chart-card">
+                    <header class="card-heading">
+                        <h3>Heatmap</h3>
+                        <p>Nutrient correlations.</p>
+                    </header>
+                    <div id="heatmap" class="heatmap-area" aria-label="Macronutrient heatmap"></div>
+                </article>
+
+                <article class="chart-card">
+                    <header class="card-heading">
+                        <h3>Pie Chart</h3>
+                        <p>Recipe distribution by diet type.</p>
+                    </header>
+                    <div class="chart-area">
+                        <canvas id="pie-chart">Diet type record distribution pie chart.</canvas>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="interaction-section" aria-labelledby="filters-heading">
+            <h2 id="filters-heading">Filters and Data Interaction</h2>
+            <div class="filter-controls">
+                <div class="visually-labelled">
+                    <label for="diet-search">Search by diet type</label>
+                    <input id="diet-search" type="search" placeholder="Search by Diet Type" autocomplete="off">
+                </div>
+                <div class="visually-labelled">
+                    <label for="diet-filter">Diet type</label>
+                    <select id="diet-filter">
+                        <option value="all">All Diet Types</option>
+                        <option value="dash">DASH</option>
+                        <option value="keto">Keto</option>
+                        <option value="mediterranean">Mediterranean</option>
+                        <option value="paleo">Paleo</option>
+                        <option value="vegan">Vegan</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="interaction-section" aria-labelledby="api-heading">
+            <h2 id="api-heading">API Data Interaction</h2>
+            <div class="api-buttons">
+                <button id="insights-button" class="button button-blue" type="button">Get Nutritional Insights</button>
+                <button id="recipes-button" class="button button-green" type="button">Get Recipes</button>
+                <button id="clusters-button" class="button button-purple" type="button">Get Clusters</button>
+            </div>
+        </section>
+
+        <section class="interaction-section pagination-section" aria-labelledby="pagination-heading">
+            <h2 id="pagination-heading">Pagination</h2>
+            <nav class="pagination" aria-label="Dashboard demonstration pages">
+                <button id="previous-page" type="button">Previous</button>
+                <button class="page-button active" type="button" data-page="1" aria-current="page">1</button>
+                <button class="page-button" type="button" data-page="2">2</button>
+                <button id="next-page" type="button">Next</button>
+            </nav>
+        </section>
+
+        <div id="status-message" class="status-message" role="status" aria-live="polite">
+            Loading nutritional insights…
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2026 Nutritional Insights. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
