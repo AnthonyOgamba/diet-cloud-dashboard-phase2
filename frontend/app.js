@@ -1,7 +1,10 @@
 "use strict";
 
-// Replace this local URL with the deployed Azure Function URL after deployment.
-const API_URL = "http://localhost:7071/api/DietAnalysisFunction";
+// Deployed Azure Function endpoint used by the dashboard.
+
+
+const API_URL =
+    "https://anthony-diet-dashboard-99241.azurewebsites.net/api/dietanalysisfunction";
 
 const VALID_DIETS = ["all", "dash", "keto", "mediterranean", "paleo", "vegan"];
 const PIE_COLORS = ["#4164E8", "#289865", "#7B35E8", "#F0A43C", "#E35572", "#25A7B8"];
@@ -47,7 +50,7 @@ async function fetchDashboardData(successMessage = "Nutritional insights updated
     } catch (error) {
         console.error("Unable to retrieve dashboard data:", error);
         showStatus(
-            `The dashboard could not connect to the Azure Function. It may not be running. Expected local endpoint: ${API_URL}. ${error.message}`,
+            `The dashboard could not connect to the Azure Function. It may not be running. Expected Azure Function endpoint: ${API_URL}. ${error.message}`,
             "error"
         );
     } finally {

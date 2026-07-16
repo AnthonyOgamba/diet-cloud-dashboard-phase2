@@ -30,7 +30,8 @@ Open `http://localhost:5500` in a browser. Do not open `index.html` with a `file
 The API endpoint is defined once near the top of `app.js`:
 
 ```javascript
-const API_URL = "http://localhost:7071/api/DietAnalysisFunction";
+const API_URL =
+    "https://anthony-diet-dashboard-99241.azurewebsites.net/api/dietanalysisfunction";;
 ```
 
 Replace this value with the deployed Azure Function URL for cloud deployment.
