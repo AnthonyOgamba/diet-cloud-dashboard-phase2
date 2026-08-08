@@ -163,55 +163,186 @@ def AllDietsBlobTrigger(input_blob: func.InputStream) -> None:
         input_blob.name,
     )
 
-
 @app.route(
     route="DietAnalysisFunction",
     auth_level=func.AuthLevel.ANONYMOUS,
     methods=["GET"],
 )
 def DietAnalysisFunction(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Phase 3 optimized dashboard endpoint.
+
+    The HTTP request no longer cleans the CSV or recalculates
+    visualization results. It reads the precomputed results created
+    by AllDietsBlobTrigger from dashboard_cache.json.
+    """
     start_time = time.time()
 
     try:
         connection_string = os.environ["AZURE_STORAGE_CONNECTION_STRING"]
         container_name = os.getenv("BLOB_CONTAINER_NAME", "datasets")
-        blob_name = os.getenv("BLOB_FILE_NAME", "cleaned_diets_dataset.csv")
 
         blob_service_client = BlobServiceClient.from_connection_string(
             connection_string
         )
-        blob_client = blob_service_client.get_blob_client(
+
+        # ---------------------------------------------------------
+        # 1. Read PRECOMPUTED dashboard cache
+        # ---------------------------------------------------------
+        cache_blob_client = blob_service_client.get_blob_client(
             container=container_name,
-            blob=blob_name,
+            blob="dashboard_cache.json",
         )
 
-        blob_data = blob_client.download_blob().readall()
-        dataframe = pd.read_csv(io.BytesIO(blob_data))
+        cache_bytes = cache_blob_client.download_blob().readall()
+        cache_data = json.loads(cache_bytes.decode("utf-8"))
 
-        diet_type = req.params.get("diet", "all")
-        filtered_dataframe = filter_by_diet(dataframe, diet_type)
+        # ---------------------------------------------------------
+        # 2. Determine requested diet
+        # ---------------------------------------------------------
+        requested_diet = req.params.get("diet", "all").strip().lower()
 
+        if requested_diet == "all":
+            cache_key = "dashboard:all"
+        else:
+            cache_key = next(
+                (
+                    key
+                    for key in cache_data.keys()
+                    if key.startswith("dashboard:")
+                    and key.split(":", 1)[1].lower() == requested_diet
+                ),
+                None,
+            )
+
+        if not cache_key or cache_key not in cache_data:
+            available_diets = sorted(
+                key.split(":", 1)[1]
+                for key in cache_data.keys()
+                if key.startswith("dashboard:")
+            )
+
+            return func.HttpResponse(
+                body=json.dumps(
+                    {
+                        "error": "Unsupported diet type.",
+                        "requested": requested_diet,
+                        "available": available_diets,
+                    }
+                ),
+                status_code=400,
+                mimetype="application/json",
+            )
+
+        # ---------------------------------------------------------
+        # 3. Get precomputed result
+        # ---------------------------------------------------------
+        cached_dashboard = cache_data[cache_key]
+
+        bar_data = cached_dashboard.get("barChart", {})
+        pie_data = cached_dashboard.get("pieChart", {})
+        average_macros = cached_dashboard.get("average_macros", {})
+        dataset_status = cache_data.get("dataset:status", {})
+
+        labels = list(bar_data.keys())
+
+        protein_values = [
+            float(bar_data[label].get("protein", 0))
+            for label in labels
+        ]
+
+        carbs_values = [
+            float(bar_data[label].get("carbs", 0))
+            for label in labels
+        ]
+
+        fat_values = [
+            float(bar_data[label].get("fat", 0))
+            for label in labels
+        ]
+
+        # ---------------------------------------------------------
+        # 4. Preserve existing frontend response structure
+        # ---------------------------------------------------------
         response_data = {
-            "filter": diet_type,
-            "summary": calculate_summary_statistics(filtered_dataframe),
-            "diet_distribution": calculate_diet_distribution(filtered_dataframe),
-            "average_nutrition": calculate_average_nutrition(filtered_dataframe),
-            "charts": {
-                "bar_chart": prepare_bar_chart_data(filtered_dataframe),
-                "pie_chart": prepare_pie_chart_data(filtered_dataframe),
-                "comparison_chart": prepare_comparison_chart_data(
-                    filtered_dataframe
+            "filter": requested_diet,
+
+            "summary": {
+                "total_records": cached_dashboard.get(
+                    "recordCount",
+                    0,
+                ),
+                "avg_protein_overall": average_macros.get(
+                    "protein",
+                    0,
+                ),
+                "avg_carbs_overall": average_macros.get(
+                    "carbs",
+                    0,
+                ),
+                "avg_fat_overall": average_macros.get(
+                    "fat",
+                    0,
                 ),
             },
+
+            "diet_distribution": pie_data,
+
+            "average_nutrition": {
+                "labels": labels,
+                "protein": protein_values,
+                "carbs": carbs_values,
+                "fat": fat_values,
+            },
+
+            "charts": {
+                "bar_chart": {
+                    "labels": labels,
+                    "values": protein_values,
+                },
+
+                "pie_chart": {
+                    "labels": list(pie_data.keys()),
+                    "values": list(pie_data.values()),
+                },
+
+                "comparison_chart": {
+                    "labels": labels,
+                    "protein": protein_values,
+                    "carbs": carbs_values,
+                    "fat": fat_values,
+                },
+            },
+
             "metadata": {
                 "container": container_name,
-                "blob": blob_name,
-                "execution_time_seconds": round(time.time() - start_time, 3),
+                "blob": "dashboard_cache.json",
+                "execution_time_seconds": round(
+                    time.time() - start_time,
+                    3,
+                ),
+                "source": "precomputed-cache",
+                "cache_key": cache_key,
+                "dataset_version": dataset_status.get(
+                    "datasetVersion"
+                ),
+                "last_processed": dataset_status.get(
+                    "lastProcessed"
+                ),
             },
         }
 
+        logging.info(
+            "PHASE3_CACHE_HIT | key=%s | version=%s",
+            cache_key,
+            dataset_status.get("datasetVersion"),
+        )
+
         return func.HttpResponse(
-            body=json.dumps(response_data),
+            body=json.dumps(
+                response_data,
+                default=_json_default,
+            ),
             status_code=200,
             mimetype="application/json",
         )
@@ -231,10 +362,16 @@ def DietAnalysisFunction(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     except Exception as error:
-        logging.exception("Diet analysis function failed.")
+        logging.exception(
+            "Cached diet analysis request failed."
+        )
 
         return func.HttpResponse(
-            body=json.dumps({"error": str(error)}),
+            body=json.dumps(
+                {
+                    "error": str(error)
+                }
+            ),
             status_code=500,
             mimetype="application/json",
         )
