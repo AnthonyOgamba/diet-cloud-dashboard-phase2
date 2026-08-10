@@ -3,3 +3,8 @@
 __pycache__
 local.settings.json
 *.pyc
+
+__blobstorage__
+__queuestorage__
+__tablestorage__
+__azurite_db_*
