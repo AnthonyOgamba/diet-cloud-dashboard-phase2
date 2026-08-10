@@ -1139,52 +1139,55 @@ function updatePagination() {
         currentPage >= totalPages;
 
     elements.pageButtons.forEach(
-        (
-            button,
-            index
-        ) => {
+        (button, index) => {
+
             let pageNumber;
 
-            if (
-                currentPage <= 1
-            ) {
-                pageNumber =
-                    index + 1;
+            if (totalPages <= 1) {
+                if (index === 0) {
+                    pageNumber = 1;
+
+                    button.hidden = false;
+                    button.dataset.page = "1";
+                    button.textContent = "1";
+
+                    button.classList.add("active");
+                    button.setAttribute(
+                        "aria-current",
+                        "page"
+                    );
+                } else {
+                    button.hidden = true;
+                }
+
+                return;
+            }
+
+            button.hidden = false;
+
+            if (currentPage === 1) {
+                pageNumber = index + 1;
             } else {
                 pageNumber =
-                    currentPage +
-                    index;
+                    currentPage + index - 1;
             }
 
-            if (
-                pageNumber >
-                totalPages
-            ) {
-                pageNumber =
-                    Math.max(
-                        1,
-                        totalPages -
-                        (
-                            elements.pageButtons.length -
-                            index -
-                            1
-                        )
-                    );
-            }
+            pageNumber = Math.max(
+                1,
+                Math.min(
+                    totalPages,
+                    pageNumber
+                )
+            );
 
             button.dataset.page =
-                String(
-                    pageNumber
-                );
+                String(pageNumber);
 
             button.textContent =
-                String(
-                    pageNumber
-                );
+                String(pageNumber);
 
             const active =
-                pageNumber ===
-                currentPage;
+                pageNumber === currentPage;
 
             button.classList.toggle(
                 "active",
@@ -1204,7 +1207,6 @@ function updatePagination() {
         }
     );
 }
-
 
 function changePage(
     page
@@ -1405,18 +1407,24 @@ function initializeDashboard() {
     cacheElements();
 
     elements.dietFilter.addEventListener(
-        "change",
-        () => {
-            currentPage =
-                1;
+    "change",
+    async () => {
+        currentPage = 1;
 
-            fetchDashboardData(
-                `${formatDietName(
-                    elements.dietFilter.value
-                )} dashboard loaded successfully.`
-            );
-        }
-    );
+        // Clear any old keyword when changing diet.
+        elements.dietSearch.value = "";
+
+        // Refresh nutritional insight charts.
+        await fetchDashboardData(
+            `${formatDietName(
+                elements.dietFilter.value
+            )} dashboard loaded successfully.`
+        );
+
+        // Refresh recipe results for the selected diet.
+        await fetchRecipes(1);
+    }
+);
 
     elements.dietSearch.addEventListener(
         "keydown",
