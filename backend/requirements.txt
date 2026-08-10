@@ -5,3 +5,6 @@
 azure-functions
 azure-storage-blob
 pandas
+azure-cosmos
+bcrypt
+PyJWT
