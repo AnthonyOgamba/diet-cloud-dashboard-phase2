@@ -3,123 +3,678 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Nutritional Insights cloud diet analysis dashboard">
+
     <title>Nutritional Insights</title>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <a class="skip-link" href="#main-content">Skip to dashboard</a>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
     <header class="site-header">
         <div class="header-inner">
+
             <h1>Nutritional Insights</h1>
+
+            <!-- Logged-in user information -->
+            <div
+                id="user-area"
+                class="user-area"
+                hidden
+            >
+                <span>
+                    Welcome,
+                    <strong id="current-user-name">User</strong>
+                </span>
+
+                <button
+                    id="logout-button"
+                    class="button logout-button"
+                    type="button"
+                >
+                    Logout
+                </button>
+            </div>
+
         </div>
     </header>
 
-    <main id="main-content" class="dashboard">
-        <section aria-labelledby="explore-heading">
-            <h2 id="explore-heading">Explore Nutritional Insights</h2>
 
-            <div class="metadata-strip" aria-label="Dataset summary">
-                <div><span>Total records</span><strong id="total-records">—</strong></div>
-                <div><span>Avg. protein</span><strong id="average-protein">—</strong></div>
-                <div><span>Avg. carbohydrates</span><strong id="average-carbs">—</strong></div>
-                <div><span>Execution time</span><strong id="execution-time">—</strong></div>
-                <div><span>Dataset</span><strong id="dataset-name">—</strong></div>
+    <!-- =====================================================
+         AUTHENTICATION SCREEN
+    ====================================================== -->
+
+    <main
+        id="auth-section"
+        class="auth-page"
+    >
+
+        <section
+            class="auth-card"
+            aria-labelledby="auth-heading"
+        >
+
+            <div class="auth-header">
+
+                <h2 id="auth-heading">
+                    Welcome to Nutritional Insights
+                </h2>
+
+                <p>
+                    Sign in or create an account to access
+                    the nutritional analytics dashboard.
+                </p>
+
             </div>
 
-            <div class="chart-grid">
-                <article class="chart-card">
-                    <header class="card-heading">
-                        <h3>Bar Chart</h3>
-                        <p>Average macronutrient content by diet type.</p>
-                    </header>
-                    <div class="chart-area">
-                        <canvas id="bar-chart">Average protein by diet type bar chart.</canvas>
-                    </div>
-                </article>
 
-                <article class="chart-card">
-                    <header class="card-heading">
-                        <h3>Scatter Plot</h3>
-                        <p>Nutrient relationships (e.g., protein vs carbs).</p>
-                    </header>
-                    <div class="chart-area">
-                        <canvas id="scatter-chart">Protein and carbohydrate relationship scatter plot.</canvas>
-                    </div>
-                </article>
+            <!-- =============================================
+                 LOGIN / REGISTER TABS
+            ============================================== -->
 
-                <article id="heatmap-card" class="chart-card">
-                    <header class="card-heading">
-                        <h3>Heatmap</h3>
-                        <p>Nutrient correlations.</p>
-                    </header>
-                    <div id="heatmap" class="heatmap-area" aria-label="Macronutrient heatmap"></div>
-                </article>
+            <div
+                class="auth-tabs"
+                role="tablist"
+                aria-label="Authentication options"
+            >
 
-                <article class="chart-card">
-                    <header class="card-heading">
-                        <h3>Pie Chart</h3>
-                        <p>Recipe distribution by diet type.</p>
-                    </header>
-                    <div class="chart-area">
-                        <canvas id="pie-chart">Diet type record distribution pie chart.</canvas>
-                    </div>
-                </article>
+                <button
+                    id="show-login-button"
+                    class="auth-tab active"
+                    type="button"
+                >
+                    Sign In
+                </button>
+
+                <button
+                    id="show-register-button"
+                    class="auth-tab"
+                    type="button"
+                >
+                    Register
+                </button>
+
             </div>
-        </section>
 
-        <section class="interaction-section" aria-labelledby="filters-heading">
-            <h2 id="filters-heading">Filters and Data Interaction</h2>
-            <div class="filter-controls">
-                <div class="visually-labelled">
-                    <label for="diet-search">Search by diet type</label>
-                    <input id="diet-search" type="search" placeholder="Search by Diet Type" autocomplete="off">
+
+            <!-- =============================================
+                 LOGIN FORM
+            ============================================== -->
+
+            <form
+                id="login-form"
+                class="auth-form"
+            >
+
+                <div class="form-group">
+
+                    <label for="login-email">
+                        Email
+                    </label>
+
+                    <input
+                        id="login-email"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required
+                    >
+
                 </div>
-                <div class="visually-labelled">
-                    <label for="diet-filter">Diet type</label>
-                    <select id="diet-filter">
-                        <option value="all">All Diet Types</option>
-                        <option value="dash">DASH</option>
-                        <option value="keto">Keto</option>
-                        <option value="mediterranean">Mediterranean</option>
-                        <option value="paleo">Paleo</option>
-                        <option value="vegan">Vegan</option>
-                    </select>
+
+
+                <div class="form-group">
+
+                    <label for="login-password">
+                        Password
+                    </label>
+
+                    <input
+                        id="login-password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
                 </div>
+
+
+                <button
+                    class="button auth-submit-button"
+                    type="submit"
+                >
+                    Sign In
+                </button>
+
+            </form>
+
+
+            <!-- =============================================
+                 REGISTRATION FORM
+            ============================================== -->
+
+            <form
+                id="register-form"
+                class="auth-form"
+                hidden
+            >
+
+                <div class="form-group">
+
+                    <label for="register-name">
+                        Name
+                    </label>
+
+                    <input
+                        id="register-name"
+                        name="name"
+                        type="text"
+                        placeholder="Enter your name"
+                        autocomplete="name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="register-email">
+                        Email
+                    </label>
+
+                    <input
+                        id="register-email"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="register-password">
+                        Password
+                    </label>
+
+                    <input
+                        id="register-password"
+                        name="password"
+                        type="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    class="button auth-submit-button"
+                    type="submit"
+                >
+                    Create Account
+                </button>
+
+            </form>
+
+
+            <!-- =============================================
+                 OR DIVIDER
+            ============================================== -->
+
+            <div class="auth-divider">
+
+                <span>
+                    OR
+                </span>
+
             </div>
+
+
+            <!-- =============================================
+                 GITHUB OAUTH
+            ============================================== -->
+
+            <a
+                id="github-login-button"
+                class="button github-button"
+                href="/.auth/login/github?post_login_redirect_uri=/"
+            >
+                Continue with GitHub
+            </a>
+
+
+            <!-- =============================================
+                 AUTH MESSAGE
+            ============================================== -->
+
+            <div
+                id="auth-message"
+                class="auth-message"
+                role="status"
+                aria-live="polite"
+            ></div>
+
         </section>
 
-        <section class="interaction-section" aria-labelledby="api-heading">
-            <h2 id="api-heading">API Data Interaction</h2>
-            <div class="api-buttons">
-                <button id="insights-button" class="button button-blue" type="button">Get Nutritional Insights</button>
-                <button id="recipes-button" class="button button-green" type="button">Get Recipes</button>
-                <button id="clusters-button" class="button button-purple" type="button">Get Clusters</button>
-            </div>
-        </section>
-
-        <section class="interaction-section pagination-section" aria-labelledby="pagination-heading">
-            <h2 id="pagination-heading">Pagination</h2>
-            <nav class="pagination" aria-label="Dashboard demonstration pages">
-                <button id="previous-page" type="button">Previous</button>
-                <button class="page-button active" type="button" data-page="1" aria-current="page">1</button>
-                <button class="page-button" type="button" data-page="2">2</button>
-                <button id="next-page" type="button">Next</button>
-            </nav>
-        </section>
-
-        <div id="status-message" class="status-message" role="status" aria-live="polite">
-            Loading nutritional insights…
-        </div>
     </main>
 
+
+    <!-- =====================================================
+         EXISTING DASHBOARD
+         Hidden until authentication succeeds.
+    ====================================================== -->
+
+    <main
+        id="main-content"
+        class="dashboard"
+        hidden
+    >
+
+        <!-- =================================================
+             DASHBOARD CHARTS
+        ================================================== -->
+
+        <section aria-labelledby="explore-heading">
+
+            <h2 id="explore-heading">
+                Explore Nutritional Insights
+            </h2>
+
+
+            <div
+                class="metadata-strip"
+                aria-label="Dataset summary"
+            >
+
+                <div>
+                    <span>Total records</span>
+                    <strong id="total-records">—</strong>
+                </div>
+
+                <div>
+                    <span>Avg. protein</span>
+                    <strong id="average-protein">—</strong>
+                </div>
+
+                <div>
+                    <span>Avg. carbohydrates</span>
+                    <strong id="average-carbs">—</strong>
+                </div>
+
+                <div>
+                    <span>Execution time</span>
+                    <strong id="execution-time">—</strong>
+                </div>
+
+                <div>
+                    <span>Dataset</span>
+                    <strong id="dataset-name">—</strong>
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 CHART GRID
+            ============================================== -->
+
+            <div class="chart-grid">
+
+
+                <!-- BAR CHART -->
+
+                <article class="chart-card">
+
+                    <header class="card-heading">
+
+                        <h3>
+                            Bar Chart
+                        </h3>
+
+                        <p>
+                            Average macronutrient content
+                            by diet type.
+                        </p>
+
+                    </header>
+
+                    <div class="chart-area">
+
+                        <canvas id="bar-chart">
+                            Average protein by diet type
+                            bar chart.
+                        </canvas>
+
+                    </div>
+
+                </article>
+
+
+                <!-- SCATTER CHART -->
+
+                <article class="chart-card">
+
+                    <header class="card-heading">
+
+                        <h3>
+                            Scatter Plot
+                        </h3>
+
+                        <p>
+                            Nutrient relationships
+                            (e.g., protein vs carbs).
+                        </p>
+
+                    </header>
+
+                    <div class="chart-area">
+
+                        <canvas id="scatter-chart">
+                            Protein and carbohydrate
+                            relationship scatter plot.
+                        </canvas>
+
+                    </div>
+
+                </article>
+
+
+                <!-- HEATMAP -->
+
+                <article
+                    id="heatmap-card"
+                    class="chart-card"
+                >
+
+                    <header class="card-heading">
+
+                        <h3>
+                            Heatmap
+                        </h3>
+
+                        <p>
+                            Nutrient correlations.
+                        </p>
+
+                    </header>
+
+                    <div
+                        id="heatmap"
+                        class="heatmap-area"
+                        aria-label="Macronutrient heatmap"
+                    ></div>
+
+                </article>
+
+
+                <!-- PIE CHART -->
+
+                <article class="chart-card">
+
+                    <header class="card-heading">
+
+                        <h3>
+                            Pie Chart
+                        </h3>
+
+                        <p>
+                            Recipe distribution
+                            by diet type.
+                        </p>
+
+                    </header>
+
+                    <div class="chart-area">
+
+                        <canvas id="pie-chart">
+                            Diet type record distribution
+                            pie chart.
+                        </canvas>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTERS AND SEARCH
+        ================================================== -->
+
+        <section
+            class="interaction-section"
+            aria-labelledby="filters-heading"
+        >
+
+            <h2 id="filters-heading">
+                Filters and Data Interaction
+            </h2>
+
+
+            <div class="filter-controls">
+
+
+                <div class="visually-labelled">
+
+                    <label for="diet-search">
+                        Search recipes
+                    </label>
+
+                    <input
+                        id="diet-search"
+                        type="search"
+                        placeholder="Search Recipes"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="visually-labelled">
+
+                    <label for="diet-filter">
+                        Diet type
+                    </label>
+
+                    <select id="diet-filter">
+
+                        <option value="all">
+                            All Diet Types
+                        </option>
+
+                        <option value="dash">
+                            DASH
+                        </option>
+
+                        <option value="keto">
+                            Keto
+                        </option>
+
+                        <option value="mediterranean">
+                            Mediterranean
+                        </option>
+
+                        <option value="paleo">
+                            Paleo
+                        </option>
+
+                        <option value="vegan">
+                            Vegan
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             API DATA INTERACTION
+        ================================================== -->
+
+        <section
+            class="interaction-section"
+            aria-labelledby="api-heading"
+        >
+
+            <h2 id="api-heading">
+                API Data Interaction
+            </h2>
+
+
+            <div class="api-buttons">
+
+                <button
+                    id="insights-button"
+                    class="button button-blue"
+                    type="button"
+                >
+                    Get Nutritional Insights
+                </button>
+
+
+                <button
+                    id="recipes-button"
+                    class="button button-green"
+                    type="button"
+                >
+                    Get Recipes
+                </button>
+
+
+                <button
+                    id="clusters-button"
+                    class="button button-purple"
+                    type="button"
+                >
+                    Get Clusters
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PAGINATION
+        ================================================== -->
+
+        <section
+            class="interaction-section pagination-section"
+            aria-labelledby="pagination-heading"
+        >
+
+            <h2 id="pagination-heading">
+                Pagination
+            </h2>
+
+
+            <nav
+                class="pagination"
+                aria-label="Recipe pages"
+            >
+
+                <button
+                    id="previous-page"
+                    type="button"
+                >
+                    Previous
+                </button>
+
+
+                <button
+                    class="page-button active"
+                    type="button"
+                    data-page="1"
+                    aria-current="page"
+                >
+                    1
+                </button>
+
+
+                <button
+                    class="page-button"
+                    type="button"
+                    data-page="2"
+                >
+                    2
+                </button>
+
+
+                <button
+                    id="next-page"
+                    type="button"
+                >
+                    Next
+                </button>
+
+            </nav>
+
+        </section>
+
+
+        <!-- =================================================
+             STATUS MESSAGE
+        ================================================== -->
+
+        <div
+            id="status-message"
+            class="status-message"
+            role="status"
+            aria-live="polite"
+        >
+            Loading nutritional insights…
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
     <footer class="site-footer">
-        <p>© 2026 Nutritional Insights. All Rights Reserved.</p>
+
+        <p>
+            © 2026 Nutritional Insights.
+            All Rights Reserved.
+        </p>
+
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+    <!-- =====================================================
+         SCRIPTS
+    ====================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+    ></script>
+
+    <!-- Authentication logic -->
+    <script src="auth.js"></script>
+
+    <!-- Existing dashboard logic -->
     <script src="app.js"></script>
+
 </body>
 </html>
